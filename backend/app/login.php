@@ -12,7 +12,7 @@ $password = $_POST["password"];
 $check_email = $conn->query("SELECT *FROM `auth` WHERE `username` = '$username' AND `password` = '$password' ")->num_rows;
 
 if ($check_email == 1) { 
-        die("error");
+        die("1");
 }else if($check_email>1){
     die("More the one deta available");
 }else{

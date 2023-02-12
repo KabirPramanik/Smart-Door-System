@@ -1,17 +1,17 @@
 <?php
 
 $servername = "localhost";
-$username = "u483648335_auth_enter_01";
-$password = "jdhDD23233@!@Cfd.nf@21dEEauth_enter_01";
-$database = "u483648335_skosao_auth";
+$username = "u483648335_raspberrypip";
+$password = "jdhDD23233@!@Cfd.nf@21dEE";
+$database = "u483648335_raspberrypip";
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "res_project";
+// $servername = "localhost";
+// $username = "root";
+// $password = "";
+// $database = "res_project";
 
 $conn = mysqli_connect($servername, $username, $password, $database);
-
+// $conn = mysqli_connect($servername, $username, $password, $database) or die('MySQLi connect failed. ' . mysqli_error($conn));  
 
 date_default_timezone_set("Asia/Kolkata");
 $time = floor(microtime(true) * 1000);;

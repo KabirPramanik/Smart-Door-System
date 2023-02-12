@@ -34,10 +34,25 @@ if ($check_email == 1) {
         $gate_open_time = $gate_open_time;
     }
 
-    if (($status == "create") && ($this_time >= ($time-(1000*60*5)))) {
-        die("1");
-    }else if (($status == "open") && ($gate_open_time >= ($time-(1000*60*2)))) {
-        die("2");
+    $res = $conn->prepare("SELECT `id` FROM `gate_auth` ORDER BY `id` DESC LIMIT 1 ");
+    $res->execute();
+    $res->bind_result($id);
+    while ($res->fetch()) {
+        $id = $id;
+    }
+
+    if (($status == "open") && ($gate_open_time >= ($time-(1000*60*2)))) {
+    
+        $data = " `status` = 'auth_close' ";
+        $data .= ", `gate_auth_close_by` = '$username' ";
+        $data .= ", `gate_auth_close_time` = '$time' ";
+        $update = $conn->query("UPDATE `gate_auth` SET " . $data . " WHERE `id` = '" . $id  . "' ");
+
+        if($update){
+            die("1");
+        }else{
+            die("Server error...");
+        }
     }else{
         die("0");
     }
