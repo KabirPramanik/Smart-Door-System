@@ -58,7 +58,7 @@ successToast(headText, bodyText, context) {
                     "assets/toast/bubbles.svg",
                     height: 48,
                     width: 48,
-                    color: Color.fromARGB(255, 6, 94, 10),
+                    color: const Color.fromARGB(255, 6, 94, 10),
                   ),
                 ],
               ),
@@ -72,7 +72,7 @@ successToast(headText, bodyText, context) {
               children: [
                 SvgPicture.asset(
                   "assets/toast/back.svg",
-                  color: Color.fromARGB(255, 6, 94, 10),
+                  color: const Color.fromARGB(255, 6, 94, 10),
                   height: 40,
                 ),
                 Positioned(
@@ -237,7 +237,7 @@ helpToast(headText, bodyText, context) {
                     "assets/toast/bubbles.svg",
                     height: 48,
                     width: 48,
-                    color: Color.fromARGB(255, 7, 22, 122),
+                    color: const Color.fromARGB(255, 7, 22, 122),
                   ),
                 ],
               ),
@@ -251,7 +251,7 @@ helpToast(headText, bodyText, context) {
               children: [
                 SvgPicture.asset(
                   "assets/toast/back.svg",
-                  color: Color.fromARGB(255, 7, 22, 122),
+                  color: const Color.fromARGB(255, 7, 22, 122),
                   height: 40,
                 ),
                 Positioned(
@@ -327,7 +327,7 @@ warningToast(headText, bodyText, context) {
                     "assets/toast/bubbles.svg",
                     height: 48,
                     width: 48,
-                    color: Color.fromARGB(255, 94, 109, 6),
+                    color: const Color.fromARGB(255, 94, 109, 6),
                   ),
                 ],
               ),
@@ -341,7 +341,7 @@ warningToast(headText, bodyText, context) {
               children: [
                 SvgPicture.asset(
                   "assets/toast/back.svg",
-                  color: Color.fromARGB(255, 94, 109, 6),
+                  color: const Color.fromARGB(255, 94, 109, 6),
                   height: 40,
                 ),
                 Positioned(

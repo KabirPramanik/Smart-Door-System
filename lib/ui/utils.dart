@@ -22,8 +22,7 @@ AppBar appBar(){
       statusBarColor: Color.fromARGB(0, 255, 255, 255), // Status bar
     ),
 
-    backgroundColor:
-    const Color.fromARGB(255, 246, 26, 10), // status bar color
+    backgroundColor: const Color.fromARGB(255, 246, 26, 10), // status bar color
     brightness: Brightness.light, // status bar brightness
   );
 }

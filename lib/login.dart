@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -48,10 +49,6 @@ class _AnonymousLogInState extends State<AnonymousLogIn> {
 
     double widthP = widthThis / widthPortfolio;
     double heightP = heightThis / heightPortfolio;
-
-    // void logIn( String username, String password) async {
-
-    // }
 
 
     return Scaffold(
@@ -156,7 +153,9 @@ class _AnonymousLogInState extends State<AnonymousLogIn> {
                   style: textStyle01(
                       "Inter", const Color(0xFF000000), FontWeight.w800, 20),
                   onChanged: (text) {
-                    print('First text field: $text');
+                    if (kDebugMode) {
+                      print('First text field: $text');
+                    }
                   },
                   decoration: inputDecoration_01(
                       const Color(0xFFE31919),
@@ -183,7 +182,9 @@ class _AnonymousLogInState extends State<AnonymousLogIn> {
                   style: textStyle01(
                       "Inter", const Color(0xFF000000), FontWeight.w800, 20),
                   onChanged: (text) {
-                    print('First text field: $text');
+                    if (kDebugMode) {
+                      print('First text field: $text');
+                    }
                     // print(EmailValidator.validate(text, true));
                   },
                   decoration: inputDecoration_01(
@@ -243,7 +244,9 @@ class _AnonymousLogInState extends State<AnonymousLogIn> {
   }
 
   logIn( username, password) async {
-      print("Successful post meth...");
+      if (kDebugMode) {
+        print("Successful post meth...");
+      }
 
       try {
         Response response = await post(Uri.parse('${api()}/login.php'),
@@ -271,14 +274,18 @@ class _AnonymousLogInState extends State<AnonymousLogIn> {
             failureToast("Unsuccessful", response.body.toString(), context);
           }
 
-          print("Successful post meth...");
-          print(response.body.toString());
+          if (kDebugMode) {
+            print(response.body.toString());
+          }
         } else {
-          print("error");
-          print(response.body.toString());
+          if (kDebugMode) {
+            print(response.body.toString());
+          }
         }
       } catch (e) {
-        print(e.toString());
+        if (kDebugMode) {
+          print(e.toString());
+        }
       }
   }
 
