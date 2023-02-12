@@ -58,7 +58,7 @@ class _MyLoginState extends State<MyLogin> {
             // TODO: Step 01 => Top circle create
             Positioned(
               left: -103 * widthP,
-              top: -280 * heightP,
+              top: -260 * heightP,
               child: Container(
                 width: 550 * widthP,
                 height: 550 * heightP,
@@ -87,7 +87,7 @@ class _MyLoginState extends State<MyLogin> {
               top: 120 * heightP,
               child: SizedBox(
                 width: 242 * widthP,
-                height: 120 * heightP,
+                height: 140 * heightP,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -114,7 +114,7 @@ class _MyLoginState extends State<MyLogin> {
                         14),
                     RichText(
                       text: TextSpan(
-                        text: 'github.com/iamsayantankar/nsec-2023-sem-06-project-vat',
+                        text: 'github.com/iamsayantankar/cloud-door-open-project-raspberry_pi_pico_w',
                         style: const TextStyle(
                           decoration: TextDecoration.underline,
                           color: Colors.blue,
@@ -124,7 +124,7 @@ class _MyLoginState extends State<MyLogin> {
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            launchUrl(Uri.parse('http://github.com/iamsayantankar/nsec-2023-sem-06-project-vat'));
+                            launchUrl(Uri.parse('http://github.com/iamsayantankar/cloud-door-open-project-raspberry_pi_pico_w'));
                           },
                       ),
                     ),
