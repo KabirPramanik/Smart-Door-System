@@ -1,3 +1,3 @@
 String api()   {
-  return "https://raspberry-pi-pico-w.sayantankar.com";
+  return "https://raspberry-pi-pico-w.sayantankar.com/app";
 }

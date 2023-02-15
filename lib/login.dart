@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:raspberry_pi_pico_w_vat_project_sem_06/home.dart';
 import 'package:raspberry_pi_pico_w_vat_project_sem_06/toast.dart';
 import 'package:raspberry_pi_pico_w_vat_project_sem_06/ui/button_style.dart';
@@ -39,6 +40,7 @@ class _AnonymousLogInState extends State<AnonymousLogIn> {
     check();
 
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -216,16 +218,21 @@ class _AnonymousLogInState extends State<AnonymousLogIn> {
             left: 234 * widthP,
             top: 750 * heightP,
             child: GestureDetector(
-              onTap: () {
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => const AnonymousLogIn())
-                // );
-                logIn(
-                    usernameTextEditingController.text.toString(),
-                    passwordTextEditingController.text.toString()
-                );
+              onTap: () async {
+                if (await Permission.location.request().isGranted) {
+                  // Either the permission was already granted before or the user just granted it.
+                  if (kDebugMode) {
+                    print("Location Permission is granted");
+                  }
+                  logIn(
+                      usernameTextEditingController.text.toString(),
+                      passwordTextEditingController.text.toString()
+                  );
+                }else{
+                if (kDebugMode) {
+                  print("Location Permission is denied.");
+                }
+                }
               },
               child: Container(
                 width: 128 * widthP,
