@@ -8,6 +8,7 @@ if (!(isset($_POST["username"]) and isset($_POST["password"]))) {
 
 $username = $_POST["username"];
 $password = $_POST["password"];
+$position = $_POST["position"];
 
 $check_email = $conn->query("SELECT *FROM `auth` WHERE `username` = '$username' AND `password` = '$password' ")->num_rows;
 
@@ -46,6 +47,7 @@ if ($check_email == 1) {
         $data = " `status` = 'open' ";
         $data .= ", `gate_open_by` = '$username' ";
         $data .= ", `gate_open_time` = '$time' ";
+        $data .= ", `gate_open_position` = '$position' ";
         $update = $conn->query("UPDATE `gate_auth` SET " . $data . " WHERE `id` = '" . $id  . "' ");
 
         if($update){

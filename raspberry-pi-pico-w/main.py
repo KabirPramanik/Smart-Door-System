@@ -1,30 +1,21 @@
+import urequests
+import network
 from machine import Pin, PWM
 import time
-import os
 
-woiki_active = True     # If woth with simulation, then this is False or Online simulatikon, this is True
-
-if woiki_active == False:
-    import network
-    import urequests
-
-
-def callError(errorMSG):
-    print(errorMSG)
-
-ssid = 'ENTER YOUR SSID'
-password = 'ENTER YOUR Wi-Fi PASSWORD'
+ssid = '12345678'
+password = '12345678'
 http_API = 'https://raspberry-pi-pico-w.sayantankar.com'
 
-if woiki_active == False:
-    wlan.connect(ssid, password)
+
+irr = Pin(10, Pin.IN)
 
 
-trig=Pin(1, Pin.OUT)
-echo=Pin(2,Pin.IN)
+servoPinIn = PWM(Pin(3))
+servoPinIn.freq(50)
 
-servoPin = PWM(Pin(3))
-servoPin.freq(50)
+servoPinOut = PWM(Pin(7))
+servoPinOut.freq(50)
 
 Led_R = PWM(Pin(4))
 Led_G = PWM(Pin(5))
@@ -37,7 +28,8 @@ Led_R.freq(2000)
 Led_G.freq(2000)
 Led_B.freq(2000)
 
-def ledRGB(R=255,G=255,B=255):
+
+def ledRGB(R=255, G=255, B=255):
     Rcode = int(65535-((65535/255)*R))
     Gcode = int(65535-((65535/255)*G))
     Bcode = int(65535-((65535/255)*B))
@@ -46,89 +38,67 @@ def ledRGB(R=255,G=255,B=255):
     Led_B.duty_u16(Bcode)
 
 
-
-
-def setServoCycle (position):
-    servoPin.duty_u16(position)
+def setServoCycle(position):
+    servoPinIn.duty_u16(position)
     time.sleep(0.01)
 
 
 def servo_openStart():
-    for pos in range(9000,1000,-50):
+    for pos in range(9000, 6000, -50):
         setServoCycle(pos)
 
 
 def servo_closeStart():
-    for pos in range(1000,9000,50):
+    for pos in range(6000, 9000, 50):
         setServoCycle(pos)
 
 
+def setExitServoCycle(position):
+    servoPinOut.duty_u16(position)
+    time.sleep(0.01)
+
+
+def servoExitOpenStart():
+    for pos in range(9000, 6000, -50):
+        setExitServoCycle(pos)
+
+
+def servoExitCloseStart():
+    for pos in range(6000, 9000, 50):
+        setExitServoCycle(pos)
+
+
 servo_closeStart()
-
-def servo_open():
-    ledRGB(0,255,0)
-
-
-def servo_close():
-    ledRGB(255,0,0)
-
-
-def servo_checking():
-    ledRGB(255,255,0)
-
-
-
-waiting_for_login_value = "0"
-def waiting_for_login_led():
-    while True:
-        if waiting_for_login_value == "1":
-            ledRGB(255,255,0)
-        else:
-            break
-        time.sleep(0.4)
-
-        if waiting_for_login_value == "1":
-            ledRGB(0,0,0)
-        else:
-            break
-        time.sleep(0.4)
-
-
-has_key_checking_error_value = "0"
-def has_key_checking_error_led():
-    while True:
-        if has_key_checking_error_value == "1":
-            ledRGB(255,0,0)
-        else:
-            break
-        time.sleep(0.4)
-
-        if has_key_checking_error_value == "1":
-            ledRGB(0,0,0)
-        else:
-            break
-        time.sleep(0.4)
-
-
 
 
 def gate_open_counting(unic_uid):
     gate_open_counting_check_call = 6*2
     while True:
         time.sleep(10)
-        if woiki_active == False:
-            myAPI = http_API+"/board/auth_close-has.php?unic_uid="+unic_uid
-            req = urequests.get(myAPI)
-            res = req.content
-        else:
-            res = "1"
+        myAPI = http_API+"/board/auth_close_has.php?unic_uid="+unic_uid
+        req = urequests.get(myAPI)
+        res = req.content
+        res = res.decode()
+        print(res)
 
         gate_open_counting_check_call -= 1
         if gate_open_counting_check_call < 0:
+            gateAutoCloseC = 5
+            while True:
+                myAPI = http_API+"/board/auto_close.php?unic_uid="+unic_uid
+                req = urequests.get(myAPI)
+                res = req.content
+                res = res.decode()
+                print(res)
+                if (res != "1"):
+                    gateAutoCloseC -= 1
+                else:
+                    break
+
+                if gateAutoCloseC < 0:
+                    break
+
             print("Time out\n")
-            myAPI = http_API+"/board/close.php"
-            req = urequests.get(myAPI)
-            res = req.content
             servo_closeStart()
             connect_WIFI()
             break
@@ -140,37 +110,26 @@ def gate_open_counting(unic_uid):
             break
 
 
-
-
 def openGate(unic_uid):
     # Code for gate open
     print("Gate open ")
-    waiting_for_login_value = "0"
-    servo_open()
     servo_openStart()
     gate_open_counting(unic_uid)
-
 
 
 # create function for checking two step verification from mobile
 def waiting_for_login_check(unic_uid):
     waiting_for_login_check_call = 12*3
     while True:
-        if woiki_active == False:
-            myAPI = http_API+"/board/check-has.php?unic_uid="+unic_uid
-            req = urequests.get(myAPI)
-            res = req.content
-        else:
-            res = "1"
+        myAPI = http_API+"/board/check-has.php?unic_uid="+unic_uid
+        req = urequests.get(myAPI)
+        res = req.content
+        res = res.decode()
+        print(res)
+
         if res == "error":
             print("Has key checking error...")
-            waiting_for_login_value = "0"
-            has_key_checking_error_value = "1"
-            has_key_checking_error_led()
             time.sleep(3)
-            has_key_checking_error_value = "0"
-            waiting_for_login_value = "1"
-            waiting_for_login_led()
         else:
             if res == "0":
                 print("Login with your id...")
@@ -190,18 +149,17 @@ def call_unic_id():
 
     call_unic_id_API_call = 5
     while True:
-        servo_checking()
         # call api and get a has key
-        if woiki_active == False:
-            myAPI = http_API+"/board/create-has"
-            req = urequests.get(myAPI)
-            res = req.content
-        else:
-            res = "46845684846gvuytu"
+        myAPI = http_API+"/board/create-has.php"
+        req = urequests.get(myAPI)
+        res = req.content
+        res = res.decode()
+
         # if response retuern error
+        print(res)
+
         if res == "error":
             print("Has key cretion error...")
-            ledRGB(73,97,7)
             time.sleep(2)
             call_unic_id_API_call -= 1
             if call_unic_id_API_call < 0:
@@ -209,99 +167,137 @@ def call_unic_id():
                 break
         # if response return has-key
         else:
-            waiting_for_login_value = "1"
-            # Mobile login start
-            waiting_for_login_led()
-            # call function for checking two step verification from mobile
-            waiting_for_login_check(res)
-            break
-
-
-
-
-
-
+            if res.startswith('HAS_'):
+                # call function for checking two step verification from mobile
+                waiting_for_login_check(res)
+                break
+            else:
+                print("Server error...")
+                time.sleep(2)
+                call_unic_id_API_call -= 1
+                if call_unic_id_API_call < 0:
+                    connect_WIFI()
+                break
 
 
 # ultrasonic sensor active
 def call_Ultrasonic_for_object():
-    ledRGB(255,0,0)
+    print("Continue...")
+    ledRGB(255, 0, 0)
     while True:
-        trig.value(1)
-        time.sleep_us(2)
-        trig.high()
-        time.sleep_us(2)
-        trig.low()
-        while echo.value()==0:
-            siga=time.ticks_us()
-        while echo.value()==1:
-            sigb=time.ticks_us()
-        tm=sigb-siga
-        dis=(tm*0.0343)/2
+        print("Continue...")
 
-        # if get any object, then call create unic id, and call api
-        if (50<dis<500):
+        if irr.value() == 0:
             call_unic_id()
             break
-
-
-        print(dis)
         time.sleep(1)
-
 
 
 # connection wifi function
 def connect_WIFI():
-    #Connect to WLAN
-    if woiki_active == False:
-        wlan = network.WLAN (network.STA_IF)
-        wlan.active(True)
-        wlan.connect(ssid, password)
-        thisCount = 30
-        while wlan.isconnected() == False:
-            print('Waiting for connection...')
-            ledRGB(0,0,255)
-            thisCount -= 1
-            if thisCount < 0:
-                callError("Please cleck your wifi otherwise, ip is blocked...")
-                ledRGB(240,0,192)
-                break
-            time.sleep(1)
+    for i in range(5):
+        ledRGB(120, 120, 120)
+        time.sleep(0.5)
+        ledRGB(0, 0, 0)
+        time.sleep(0.5)
+    # Connect to WLAN
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    wlan.connect(ssid, password)
+    thisCount = 30
+    while wlan.isconnected() == False:
+        print('Waiting for connection...')
+        ledRGB(0, 0, 255)
+        thisCount -= 1
+        if thisCount < 0:
+            print("Please cleck your wifi otherwise, ip is blocked...")
+            ledRGB(240, 0, 192)
+            break
+        time.sleep(1)
 
+    thisCount = 30
+    while True:
+        if wlan.status() < 0 or wlan.status() >= 3:
+            break
+        thisCount -= 1
+        print('waiting for get ip...')
+        ledRGB(0, 204, 240)
+        if thisCount < 0:
+            print("Could not get any ip...")
+            ledRGB(240, 116, 0)
+            break
+        time.sleep(1)
 
-        thisCount = 30
-        while True:
-            if wlan.status() < 0 or wlan.status() >= 3:
-                break
-            thisCount -= 1
-            print('waiting for get ip...')
-            ledRGB(0,204,240)
-            if thisCount < 0:
-                callError("Could not get any ip...")
-                ledRGB(240,116,0)
-                break
-            time.sleep(1)
+    thisCount = 30
+    while True:
+        if wlan.status() != 3:
+            print('waiting for resolve network connection...')
+            ledRGB(240, 0, 100)
+        else:
+            break
 
+        thisCount -= 1
+        if thisCount < 0:
+            print("network connection failed...")
+            ledRGB(104, 41, 110)
+            break
 
-
-        thisCount = 30
-        while True:
-            if wlan.status() != 3:
-                print('waiting for resolve network connection...')
-                ledRGB(240,0,100)
-            else:
-                break
-
-            thisCount -= 1
-            if thisCount < 0:
-                callError("network connection failed...")
-                ledRGB(104,41,110)
-                break
-
-            time.sleep(1)
+        time.sleep(1)
 
     # call function for ultrasonic sensor active
+    print("Done")
     call_Ultrasonic_for_object()
 
 
 connect_WIFI()
+
+
+# Code for exit gate
+while True:
+    time.sleep(5)
+    myAPI01 = http_API+"/board/exit_open.php"
+    req1 = urequests.get(myAPI01)
+    res1 = req1.content
+    res1 = res1.decode()
+    print(res1)
+    if reres1s == "error":
+        print("Has key cretion error...")
+        time.sleep(2)
+        call_unic_id_API_call -= 1
+        if call_unic_id_API_call < 0:
+            connect_WIFI()
+            break
+    elif res1 == "0":
+        continue
+    else:
+        if res.startswith('HAS_'):
+            # call function for open exit door...
+            servoExitOpenStart()
+            servoExitDoorCountDown = 12*3
+            while True:
+                myAPI02 = http_API+"/board/exit_close.php?unic_uid="+res1
+                req2 = urequests.get(myAPI02)
+                res2 = req2.content
+                res2 = res2.decode()
+
+                if (res2 == "1"):
+                    # call function for close exit door...
+                    servoExitCloseStart()
+                    break
+                servoExitDoorCountDown -= 1
+                time.sleep(5)
+                if res2 == "0":
+                    if servoExitDoorCountDown < 0:
+                        myAPI03 = http_API+"/board/exit_close_auto.php?unic_uid="+res1
+                        req3 = urequests.get(myAPI03)
+                        res3 = req3.content
+                        res3 = res3.decode()
+                        break
+
+        else:
+            print("Server error...")
+            time.sleep(2)
+            call_unic_id_API_call -= 1
+            if call_unic_id_API_call < 0:
+                connect_WIFI()
+            break
